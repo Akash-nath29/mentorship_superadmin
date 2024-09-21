@@ -1,0 +1,224 @@
+<!-- Author:
+Akash Nath - AIML(2023-2027) - 2nd year - https://github.com/Akash-nath29 - https://www.linkedin.com/in/akash-nath29/
+Abhinaba Biswas - AIML(2023-2027) - 2nd year - https://github.com/abhinababiswas01 - https://www.linkedin.com/in/abhinaba-biswas/ -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Details: {{entry.uid}}</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='profile.css')}}">
+    <link rel="website icon" type="image/png" href="{{url_for('static', filename='collegeLogo.png')}}">
+    <meta property="og:title" content="Mentorship Records" />
+    <meta property="og:description" content="Record keeping of Mentorship details" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" />
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for message in messages %}
+        <script>
+            alert("{{message}}");
+        </script>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {% if user %}
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{url_for('static', filename='collegeLogo.png')}}" alt="Logo">
+        </div>
+        <div class="profile">
+            <h2>{{user.role}}</h2>
+            <a href="/logout" class="logout-btn">Log Out</a>
+        </div>
+        <nav>
+            <ul>
+                <li>
+                    <a href="/">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z" />
+                        </svg>&nbsp;
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="/profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+                        </svg>&nbsp;
+                        Profile
+                    </a>
+                </li>
+                {% if user.role in ['mentor', 'admin'] %}
+                {% if user.role == 'admin' %}
+                <li>
+                    <a href="/dashboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z" />
+                        </svg>&nbsp;
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/register">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 640 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM504 312l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
+                        </svg>&nbsp;
+                        Add User
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="/schedule_meet">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L64 64C28.7 64 0 92.7 0 128l0 16 0 48L0 448c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-256 0-48 0-16c0-35.3-28.7-64-64-64l-40 0 0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L152 64l0-40zM48 192l80 0 0 56-80 0 0-56zm0 104l80 0 0 64-80 0 0-64zm128 0l96 0 0 64-96 0 0-64zm144 0l80 0 0 64-80 0 0-64zm80-48l-80 0 0-56 80 0 0 56zm0 160l0 40c0 8.8-7.2 16-16 16l-64 0 0-56 80 0zm-128 0l0 56-96 0 0-56 96 0zm-144 0l0 56-64 0c-8.8 0-16-7.2-16-16l0-40 80 0zM272 248l-96 0 0-56 96 0 0 56z" />
+                        </svg>&nbsp;
+                        Schedule a Meeting
+                    </a>
+                </li>
+                <li>
+                    <a href="/add_entry">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z" />
+                        </svg>&nbsp;
+                        Add Entry
+                    </a>
+                </li>
+                <li>
+                    <a href="/add_session">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M96 32l0 32L48 64C21.5 64 0 85.5 0 112l0 48 448 0 0-48c0-26.5-21.5-48-48-48l-48 0 0-32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 32L160 64l0-32c0-17.7-14.3-32-32-32S96 14.3 96 32zM448 192L0 192 0 464c0 26.5 21.5 48 48 48l352 0c26.5 0 48-21.5 48-48l0-272zM224 248c13.3 0 24 10.7 24 24l0 56 56 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-56 0 0 56c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-56-56 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l56 0 0-56c0-13.3 10.7-24 24-24z" />
+                        </svg>&nbsp;
+                        Add Session
+                    </a>
+                </li>
+                {% endif %}
+                {% if user.role == 'student' %}
+                <li>
+                    <a href="/schedules_meetings">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 576 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M0 128C0 92.7 28.7 64 64 64l256 0c35.3 0 64 28.7 64 64l0 256c0 35.3-28.7 64-64 64L64 448c-35.3 0-64-28.7-64-64L0 128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2l0 256c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1l0-17.1 0-128 0-17.1 14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z" />
+                        </svg>&nbsp;
+                        Scheduled Meetings
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    <div class="content">
+        <header>
+            <h1>Hi, {{user.username}} !!</h1>
+            <p>Account Type: {{user.role.capitalize()}} | Email: <a href="mailto:{{user.email}}"
+                    style="color: black;">{{user.email}}</a></p>
+        </header>
+        <br>
+        <section class="students">
+            <h2>Student Details</h2>
+            <br>
+            <div class="student-details">
+                <div class="details-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" value="{{entry.name}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="roll">Roll No.:</label>
+                    <input type="text" id="roll" value="{{entry.student_roll}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="program">Program:</label>
+                    <input type="text" id="program" value="{{entry.program}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="department">Department:</label>
+                    <input type="text" id="department" value="{{entry.department}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="section">Section:</label>
+                    <input type="text" id="section" value="{{entry.section}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="group">Group:</label>
+                    <input type="text" id="group" value="{{entry.group}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="jis_id">JIS ID:</label>
+                    <input type="text" id="jis_id" value="{{entry.jis_id}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="phone">Contact:</label>
+                    <input type="text" id="phone" value="{{entry.phone}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" value="{{entry.email}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="father_name">Father Name:</label>
+                    <input type="text" id="father_name" value="{{entry.father_name}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="father_phone">Father Contact:</label>
+                    <input type="text" id="father_phone" value="{{entry.father_phone}}" disabled>
+                </div>
+            </div>
+        </section>
+        <section class="mentorship">
+            <h2>Mentor Details</h2>
+            <br>
+            <div class="mentor-details">
+                <div class="details-group">
+                    <label for="mentor_name">Mentor Name:</label>
+                    <input type="text" id="mentor_name" value="{{entry.mentor_name}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="mentor_email">Mentor Email:</label>
+                    <input type="text" id="mentor_email" value="{{entry.mentor_email}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="mentor_phone">Mentor Contact:</label>
+                    <input type="text" id="mentor_phone" value="{{entry.mentor_phone}}" disabled>
+                </div>
+                <div class="details-group">
+                    <label for="mentor_department">Mentor Department:</label>
+                    <input type="text" id="mentor_department" value="{{entry.mentor_department}}" disabled>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteLinks = document.querySelectorAll('.delete-link');
+
+            deleteLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const confirmDelete = confirm('Are you sure you want to delete this entry?');
+
+                    if (confirmDelete) {
+                        window.location.href = this.getAttribute('href');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

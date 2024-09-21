@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Table</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Entry</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>UID</th>
+            <th>Student Roll</th>
+            <th>Program</th>
+            <th>Department</th>
+            <th>Section</th>
+            <th>Group</th>
+            <th>Name</th>
+            <th>JIS ID</th>
+            <th>Admission year</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Father Name</th>
+            <th>Father Phone</th>
+            <th>Mentor Name</th>
+            <th>Mentor Email</th>
+            <th>Mentor Phone</th>
+            <th>Mentor Department</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ entry.id }}</td>
+            <td>{{ entry.uid }}</td>
+            <td>{{ entry.student_roll }}</td>
+            <td>{{ entry.program }}</td>
+            <td>{{ entry.department }}</td>
+            <td>{{ entry.section }}</td>
+            <td>{{ entry.group }}</td>
+            <td>{{ entry.name }}</td>
+            <td>{{ entry.jis_id }}</td>
+            <td>{{ entry.admission_year }}</td>
+            <td>{{ entry.phone }}</td>
+            <td>{{ entry.email }}</td>
+            <td>{{ entry.father_name }}</td>
+            <td>{{ entry.father_phone }}</td>
+            <td>{{ entry.mentor_name }}</td>
+            <td>{{ entry.mentor_email }}</td>
+            <td>{{ entry.mentor_phone }}</td>
+            <td>{{ entry.mentor_department }}</td>
+        </tr>
+        {% endfor %}
+        <!-- {{ entries }} -->
+    </tbody>
+</table>
+
+</body>
+</html>

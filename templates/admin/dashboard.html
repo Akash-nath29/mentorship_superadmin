@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JIS College of Engineering - Mentorship Dashboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        background-color: #1a1d2e;
+        color: #ffffff;
+      }
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+      .sidebar {
+        width: 240px;
+        background-color: #2e1a4a;
+        padding: 20px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .logo img {
+        width: 50px;
+        margin-right: 10px;
+      }
+      .logo span {
+        font-size: 16px;
+        font-weight: bold;
+      }
+      .menu-item {
+        padding: 10px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .menu-item:hover {
+        background-color: #3d2a5a;
+        transform: translateX(5px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .menu-item.active {
+        background-color: #ff6b6b;
+      }
+      .menu-item.active:hover {
+        transform: translateX(5px) scale(1.05);
+      }
+      .main-content {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .welcome-message {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .email {
+        font-size: 14px;
+        color: #a0a0a0;
+      }
+      .stats-cards {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .stat-card {
+        padding: 20px;
+        border-radius: 10px;
+        width: 23%;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+      .stat-card h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+      .stat-card .stat {
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .stat-card:nth-child(1) {
+        background-color: #ff6b6b;
+      }
+      .stat-card:nth-child(2) {
+        background-color: #4e54c8;
+      }
+      .stat-card:nth-child(3) {
+        background-color: #2ecc71;
+      }
+      .stat-card:nth-child(4) {
+        background-color: #9b59b6;
+      }
+      .chart-container {
+        background-color: #2a2d3e;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+      }
+      .chart-container:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .chart {
+        height: 300px;
+        background-color: #3a3f55;
+        border-radius: 10px;
+      }
+      .logout-btn {
+        background-color: #ff6b6b;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 100%;
+        transition: all 0.3s ease;
+      }
+      .logout-btn:hover {
+        background-color: #ff8f8f;
+        transform: scale(1.05);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar">
+        <div class="logo">
+          <img
+            src="/api/placeholder/50/50"
+            alt="JIS College of Engineering Logo"
+          />
+          <span>JIS College of Engineering</span>
+        </div>
+        <div class="menu-item active">Home</div>
+        <div class="menu-item">Profile</div>
+        <div class="menu-item">Dashboard</div>
+        <div class="menu-item">Add User</div>
+        <div class="menu-item">Schedule a Meeting</div>
+        <div class="menu-item">Add Entry</div>
+        <div class="menu-item">Add Session</div>
+        <button class="logout-btn">Logout</button>
+      </div>
+      <div class="main-content">
+        <div class="header">
+          <div>
+            <h1 class="welcome-message">Welcome, abhispc0001@gmail.com</h1>
+            <p class="email">Email: abhispc0001@gmail.com</p>
+          </div>
+        </div>
+        <div class="stats-cards">
+          <div class="stat-card">
+            <h3>Total Entries</h3>
+            <div class="stat">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Mentees</h3>
+            <div class="stat">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Mentors</h3>
+            <div class="stat">1</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Sessions</h3>
+            <div class="stat">0</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div class="chart-header">
+            <h2>Weekly Activity</h2>
+          </div>
+          <div class="chart">
+            <script>
+              // Sample data for the chart
+              const weeklyData = {
+                labels: [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ],
+                datasets: [
+                  {
+                    label: "Sessions Held",
+                    data: [5, 7, 6, 8, 4, 3, 2],
+                    backgroundColor: "rgba(75, 192, 192, 0.6)",
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    borderWidth: 1,
+                  },
+                  {
+                    label: "Students Participated",
+                    data: [10, 15, 12, 18, 8, 5, 3],
+                    backgroundColor: "rgba(255, 159, 64, 0.6)",
+                    borderColor: "rgba(255, 159, 64, 1)",
+                    borderWidth: 1,
+                  },
+                ],
+              };
+
+              // Chart configuration
+              const config = {
+                type: "bar",
+                data: weeklyData,
+                options: {
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      position: "top",
+                    },
+                    title: {
+                      display: true,
+                      text: "Weekly Mentorship Activity",
+                    },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: "Number of Sessions/Students",
+                      },
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: "Day of the Week",
+                      },
+                    },
+                  },
+                },
+              };
+
+              // Create the chart
+              const ctx = document
+                .getElementById("weeklyActivityChart")
+                .getContext("2d");
+              new Chart(ctx, config);
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
