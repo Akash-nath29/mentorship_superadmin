@@ -1,0 +1,180 @@
+<!-- Author:
+Akash Nath - AIML(2023-2027) - 2nd year - https://github.com/Akash-nath29 - https://www.linkedin.com/in/akash-nath29/
+Abhinaba Biswas - AIML(2023-2027) - 2nd year - https://github.com/abhinababiswas01 - https://www.linkedin.com/in/abhinaba-biswas/ -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <link rel="website icon" type="image/png" href="{{url_for('static', filename='collegeLogo.png')}}">
+    <meta property="og:title" content="Mentorship Records" />
+    <meta property="og:description" content="Record keeping of Mentorship details" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f4f4f4;
+            color: black;
+        }
+
+        .container {
+            display: flex;
+            width: 70%;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url("{{url_for('static', filename='img/bg.jpg')}}") no-repeat center center/cover;
+        }
+
+        .logo img {
+            max-width: 200px;
+            height: auto;
+            /* border: 1px solid red; */
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .form-container {
+            flex: 2;
+            padding: 20px;
+            position: relative;
+        }
+
+        .form-background {
+            /* background-image: url("{{url_for('static', filename='img/bg.jpg')}}"); */
+            /* Set the image URL */
+            background-size: cover;
+            background-position: center;
+            padding: 40px;
+            /* color: #fff; */
+            text-align: center;
+        }
+
+        h1,
+        h2 {
+            margin: 0 0 20px;
+            font-weight: normal;
+        }
+
+        .tabs a {
+            /* color: #fff; */
+            margin: 0 10px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .tabs a:hover {
+            text-decoration: underline;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input {
+            width: 80%;
+            /* padding: 10px; */
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            border: 1px solid #585858;
+            outline: none;
+        }
+
+        select {
+            width: 87%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #585858;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3e3f8a;
+            /* Match the color */
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #575aa9;
+        }
+
+        p {
+            margin-top: 20px;
+        }
+
+        p a {
+            /* color: #fff; */
+            text-decoration: underline;
+        }
+
+        /* p a:hover {
+            color: #ccc;
+        } */
+    </style>
+
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for message in messages %}
+        <script>
+            alert("{{message}}");
+        </script>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="container">
+        <div class="logo">
+            <img src="{{url_for('static', filename='collegeLogo.png')}}" alt="JIS College of Engineering Logo">
+        </div>
+        <div class="form-container">
+            <div class="form-background">
+                <h1>MENTORSHIP</h1>
+                <h2>Register</h2>
+                <form action="/register" method="post">
+                    <select id="role" name="role">
+                        <option value=""> -- Registration Type -- </option>
+                        <option value="admin">Admin</option>
+                        <option value="mentor">Mentor</option>
+                        <option value="student">Student</option>
+                    </select>
+                    <input type="text" placeholder="Username" required name="username">
+                    <input type="email" placeholder="Email" required name="email">
+                    <input type="password" placeholder="Password" required name="password">
+                    <button type="submit">Register</button>
+                </form>
+                <p>Already have an account? <a href="/login">Log in</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

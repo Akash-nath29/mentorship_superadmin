@@ -1,274 +1,663 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JIS College of Engineering - Mentorship Dashboard</title>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - JIS College of Engineering</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='profile.css')}}">
+    <link rel="website icon" type="image/png" href="{{url_for('static', filename='collegeLogo.png')}}">
+    <meta property="og:title" content="Mentorship Records" />
+    <meta property="og:description" content="Record keeping of Mentorship details" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" />
+
+    <!-- Add Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Add custom styles -->
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-      }
-      body {
-        background-color: #1a1d2e;
-        color: #ffffff;
-      }
-      .container {
-        display: flex;
-        height: 100vh;
-      }
-      .sidebar {
-        width: 240px;
-        background-color: #2e1a4a;
-        padding: 20px;
-      }
-      .logo {
-        display: flex;
-        align-items: center;
-        margin-bottom: 30px;
-      }
-      .logo img {
-        width: 50px;
-        margin-right: 10px;
-      }
-      .logo span {
-        font-size: 16px;
-        font-weight: bold;
-      }
-      .menu-item {
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-      .menu-item:hover {
-        background-color: #3d2a5a;
-        transform: translateX(5px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      }
-      .menu-item.active {
-        background-color: #ff6b6b;
-      }
-      .menu-item.active:hover {
-        transform: translateX(5px) scale(1.05);
-      }
-      .main-content {
-        flex-grow: 1;
-        padding: 20px;
-        overflow-y: auto;
-      }
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-      .welcome-message {
-        font-size: 24px;
-        font-weight: bold;
-      }
-      .email {
-        font-size: 14px;
-        color: #a0a0a0;
-      }
-      .stats-cards {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-      }
-      .stat-card {
-        padding: 20px;
-        border-radius: 10px;
-        width: 23%;
-        text-align: center;
-        transition: all 0.3s ease;
-      }
-      .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-      .stat-card h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-      }
-      .stat-card .stat {
-        font-size: 28px;
-        font-weight: bold;
-      }
-      .stat-card:nth-child(1) {
-        background-color: #ff6b6b;
-      }
-      .stat-card:nth-child(2) {
-        background-color: #4e54c8;
-      }
-      .stat-card:nth-child(3) {
-        background-color: #2ecc71;
-      }
-      .stat-card:nth-child(4) {
-        background-color: #9b59b6;
-      }
-      .chart-container {
-        background-color: #2a2d3e;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        transition: all 0.3s ease;
-      }
-      .chart-container:hover {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-      .chart-header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-      }
-      .chart {
-        height: 300px;
-        background-color: #3a3f55;
-        border-radius: 10px;
-      }
-      .logout-btn {
-        background-color: #ff6b6b;
-        color: #ffffff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-top: 20px;
-        width: 100%;
-        transition: all 0.3s ease;
-      }
-      .logout-btn:hover {
-        background-color: #ff8f8f;
-        transform: scale(1.05);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      }
+        :root {
+            --primary-color: #0A3D62;
+            /* JIS College Blue */
+            --secondary-color: #58B19F;
+            /* Secondary color */
+            --background-color: #F9FBFD;
+            --text-color: #2C3E50;
+            --accent-color: #EE5A24;
+            /* Accent color for highlights */
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        } */
+
+        .logo img {
+            width: 80%;
+            display: block;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-color);
+        }
+
+        .profile h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .profile .logout-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            background-color: red;
+            color: var(--white);
+            text-align: center;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        /* .profile .logout-btn:hover {
+            background-color: #FF6F61;
+        } */
+
+        /* nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            border-radius: 10px;
+            padding: 10px;
+        } */
+
+        /* nav ul li:hover {
+            background-color: #1A5276;
+        } */
+
+        nav ul li a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        nav ul li i {
+            margin-right: 10px;
+        }
+
+        /* nav ul li a:hover {
+            color: var(--accent-color);
+        } */
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--background-color);
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+            color: var(--primary-color);
+        }
+
+        header p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        section.students {
+            margin-bottom: 40px;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        section.students h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid #E5E5E5;
+            padding: 8px 12px;
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            font-weight: bold;
+            color: var(--white);
+        }
+
+        td a {
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card-container a {
+            text-decoration: none;
+        }
+
+        .card {
+            flex: 1;
+            margin: 10px;
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            /* color: var(--text-color); */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 24px;
+            /* color: var(--primary-color); */
+            color: white;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 16px;
+            color: white;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: 20px 0;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container .recent-updates {
+            width: 100%;
+            margin-top: 20px;
+            /* color: var(--text-color); */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .chart-container .recent-updates p {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.354);
+            width: 200px;
+            height: 80px;
+            padding: 20px;
+            border-radius: 15px;
+            transition: 0.4s;
+        }
+        
+        .chart-container .recent-updates p:hover {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.632);
+            transform: translateY(-2px);
+        }
+
+        .activities-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .activities-list li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #F0F4F8;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .activities-list li span {
+            color: var(--text-color);
+        }
+
+        .meetings {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+        }
+
+        .meetings h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+
+        .meetings ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .meetings ul li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #F0F4F8;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+                padding: 10px;
+            }
+
+            .sidebar .logo img {
+                width: 40px;
+                height: 40px;
+                margin: 0;
+            }
+
+            .sidebar nav ul li {
+                justify-content: center;
+            }
+
+            .sidebar nav ul li a {
+                display: block;
+                text-align: center;
+                font-size: 10px;
+            }
+
+            .sidebar .profile {
+                display: none;
+            }
+
+            .content {
+                width: calc(100% - 60px);
+                padding: 10px;
+            }
+
+            .card-container {
+                flex-direction: column;
+            }
+
+            footer {
+                width: calc(100% - 60px);
+                left: 60px;
+            }
+        }
+
+        .tab1 {
+            background: url("{{url_for('static', filename='img/tab1.svg')}}") no-repeat center;
+            background-size: cover;
+            color: white;
+        }
+
+        .tab2 {
+            background: url("{{url_for('static', filename='img/tab2.svg')}}") no-repeat center;
+            background-size: cover;
+            color: white;
+        }
+
+        .tab3 {
+            background: url("{{url_for('static', filename='img/tab3.svg')}}") no-repeat center;
+            background-size: cover;
+            color: white;
+        }
+
+        .tab4 {
+            background: url("{{url_for('static', filename='img/tab4.svg')}}") no-repeat center;
+            background-size: cover;
+            color: white;
+        }
+
+        nav ul li a {
+            /* margin: 15px 0; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            /* padding: 10px; */
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="sidebar">
+
+    <!-- Add Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Add Font Awesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
         <div class="logo">
-          <img
-            src="/api/placeholder/50/50"
-            alt="JIS College of Engineering Logo"
-          />
-          <span>JIS College of Engineering</span>
+            <img src="{{ url_for('static', filename='collegeLogo.png') }}" alt="JIS College Logo">
         </div>
-        <div class="menu-item active">Home</div>
-        <div class="menu-item">Profile</div>
-        <div class="menu-item">Dashboard</div>
-        <div class="menu-item">Add User</div>
-        <div class="menu-item">Schedule a Meeting</div>
-        <div class="menu-item">Add Entry</div>
-        <div class="menu-item">Add Session</div>
-        <button class="logout-btn">Logout</button>
-      </div>
-      <div class="main-content">
-        <div class="header">
-          <div>
-            <h1 class="welcome-message">Welcome, abhispc0001@gmail.com</h1>
-            <p class="email">Email: abhispc0001@gmail.com</p>
-          </div>
+        <div class="profile">
+            <h2>{{user.username}}</h2>
+            <a class="logout-btn" href="/logout">Logout</a>
         </div>
-        <div class="stats-cards">
-          <div class="stat-card">
-            <h3>Total Entries</h3>
-            <div class="stat">0</div>
-          </div>
-          <div class="stat-card">
-            <h3>Total Mentees</h3>
-            <div class="stat">0</div>
-          </div>
-          <div class="stat-card">
-            <h3>Total Mentors</h3>
-            <div class="stat">1</div>
-          </div>
-          <div class="stat-card">
-            <h3>Total Sessions</h3>
-            <div class="stat">0</div>
-          </div>
-        </div>
-        <div class="chart-container">
-          <div class="chart-header">
-            <h2>Weekly Activity</h2>
-          </div>
-          <div class="chart">
-            <script>
-              // Sample data for the chart
-              const weeklyData = {
-                labels: [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday",
-                ],
-                datasets: [
-                  {
-                    label: "Sessions Held",
-                    data: [5, 7, 6, 8, 4, 3, 2],
-                    backgroundColor: "rgba(75, 192, 192, 0.6)",
-                    borderColor: "rgba(75, 192, 192, 1)",
-                    borderWidth: 1,
-                  },
-                  {
-                    label: "Students Participated",
-                    data: [10, 15, 12, 18, 8, 5, 3],
-                    backgroundColor: "rgba(255, 159, 64, 0.6)",
-                    borderColor: "rgba(255, 159, 64, 1)",
-                    borderWidth: 1,
-                  },
-                ],
-              };
-
-              // Chart configuration
-              const config = {
-                type: "bar",
-                data: weeklyData,
-                options: {
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      position: "top",
-                    },
-                    title: {
-                      display: true,
-                      text: "Weekly Mentorship Activity",
-                    },
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      title: {
-                        display: true,
-                        text: "Number of Sessions/Students",
-                      },
-                    },
-                    x: {
-                      title: {
-                        display: true,
-                        text: "Day of the Week",
-                      },
-                    },
-                  },
-                },
-              };
-
-              // Create the chart
-              const ctx = document
-                .getElementById("weeklyActivityChart")
-                .getContext("2d");
-              new Chart(ctx, config);
-            </script>
-          </div>
-        </div>
-      </div>
+        <nav>
+            <ul>
+                <li>
+                    <a href="/">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z" />
+                        </svg>&nbsp;
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="/profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+                        </svg>&nbsp;
+                        Profile
+                    </a>
+                </li>
+                <li>
+                    <a href="/dashboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z" />
+                        </svg>&nbsp;
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/register">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 640 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM504 312l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
+                        </svg>&nbsp;
+                        Add User
+                    </a>
+                </li>
+                
+            </ul>
+        </nav>
     </div>
-  </body>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Header -->
+        <header style="padding-left: 15px;">
+            <div>
+                <h1>Welcome, {{user.username}}</h1>
+                <p>Email: <a href="mailto:{{user.email}}" target="_blank" style="color: black;">{{user.email}}</a></p>
+            </div>
+            <div class="card-container">
+                <a href="/entries">
+                    <div class="card tab1">
+                        <h3>Total Entries</h3>
+                        <b>
+                            <p>{{total_entries}}</p>
+                        </b>
+                    </div>
+                </a>
+                <a href="/mentees">
+                    <div class="card tab2">
+                        <h3>Total Mentees</h3>
+                        <b>
+                            <p>{{total_students}}</p>
+                        </b>
+                    </div>
+                </a>
+                <a href="/mentors">
+                    <div class="card tab3">
+                        <h3>Total Mentors</h3>
+                        <b>
+                            <p>{{total_mentors}}</p>
+                        </b>
+                    </div>
+                </a>
+                <a href="/sessions">
+                    <div class="card tab4">
+                        <h3>Total Sessions</h3>
+                        <b>
+                            <p>{{total_sessions}}</p>
+                        </b>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+            <div class="recent-updates">
+                <p>Mentee Registered: <br>{{latest_mentee.username}}</p>
+                <p>Mentor Registered: <br>{{latest_mentor.username}}</p>
+                <p>Admin Registered: <br>{{latest_admin.username}}</p>
+            </div>
+        </div>
+
+        <!-- Admin Records -->
+        <section class="students">
+            <h2>Admin Records</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins %}
+                        <tr>
+                            <td>{{ admin.username }}</td>
+                            <td><a href="mailto:{{ admin.email }}">{{ admin.email }}</a></td>
+                            <td>
+                                <a href="/admins">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Meetings -->
+        <!-- <div class="meetings">
+            <h3>Upcoming/Held Meetings</h3>
+            <ul>
+                <li><span>10:00 AM - Meeting with [Name]</span></li>
+                <li><span>11:30 AM - Project Discussion with [Name]</span></li>
+                <li><span>1:00 PM - Review Session</span></li>
+            </ul>
+        </div> -->
+
+        <!-- Recent Activities -->
+        <h2>Recent Activities</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <!-- <th>Functions</th> -->
+                        <th>UID</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Mentor Email</th>
+                        <th>Meeting Link</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for each_entry in online_meetings %}
+                    <tr>
+                        <td>{{each_entry.uid[:10]}}...</td>
+                        <td>{{each_entry.date}}</td>
+                        <td>{{each_entry.time}}</td>
+                        <td>{{each_entry.mentor_email}}</td>
+                        <td>{{each_entry.link}}</td>
+                        <td>{{each_entry.description}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br><br><br>
+    <!-- Footer -->
+    <footer>
+        Developed by Department of AIML and CST | © JISCE 2024 
+    </footer>
+
+    <!-- JavaScript for Chart -->
+    <script>
+        // Get the chart context
+        const ctx = document.getElementById('myChart').getContext('2d');
+    
+        // Data for the chart
+        const dailyLabels = {{ daily_sessions_count.keys() | list | tojson }};
+        const sessionsData = {{ daily_sessions_count.values() | list | tojson }};
+        const studentsData = {{ daily_students_count.values() | list | tojson }};
+    
+        console.log(dailyLabels);  // Debugging: Check if days are correct
+        console.log(sessionsData); // Debugging: Check if session counts are correct
+        console.log(studentsData); // Debugging: Check if student counts are correct
+    
+        // Chart data configuration
+        const chartData = {
+            labels: dailyLabels,
+            datasets: [
+                {
+                    label: 'Sessions Held',
+                    data: sessionsData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Students Participated',
+                    data: studentsData,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        };
+    
+        // Chart configuration
+        const config = {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': ' + context.raw;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+    
+        // Create the chart
+        new Chart(ctx, config);
+    </script>
+    
+</body>
+
 </html>

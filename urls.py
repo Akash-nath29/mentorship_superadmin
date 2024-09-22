@@ -1,18 +1,70 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import requests
 from collections import defaultdict
+from models import *
+from werkzeug.security import generate_password_hash, check_password_hash
+from utils.generate_uid import generate_uid
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-db = SQLAlchemy(app)
+app.config['SECRET_KEY'] = 'secret'
+
 
 response = requests.get("http://127.0.0.1:5001/api/aiml").json()
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = User.query.filter_by(email=email).first()
+        if not user:
+        
+        # Hash the password before storing it
+            hashed_password = generate_password_hash(password)
+            
+            new_user = User(uid = generate_uid('superadmin'), username=username, email=email, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+        
+        else:
+            flash("User already exists!!")
+            return redirect(url_for('login'))
+        return redirect(url_for('login'))
+    
+    return render_template('auth/register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            if check_password_hash(user.password, password):
+                session['user_uid'] = user.uid
+                return redirect(url_for('admin_dashboard'))
+            else:
+                flash("Incorrect password")
+        else:
+            flash("User does not exist")
+            return redirect(url_for('register'))
+    
+    return render_template('auth/login.html')
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'user_uid' in session:    
+        user = User.query.filter_by(uid = session['user_uid']).first()
+        if user:
+            return render_template('index.html')
+    return redirect('login')
 
 @app.route('/details/aiml')
 def aiml():
@@ -23,47 +75,47 @@ def aiml():
 
 @app.route('/dashboard')
 def admin_dashboard():
+    if 'user_uid' not in session:
+        flash("Please login first", "info")
+        return redirect('login')
+
+    user = User.query.filter_by(uid=session['user_uid']).first()
+
     # Get the entries and users data from the API response
     entries = response['entries']
     students = [user for user in response['users'] if user['role'] == 'student']
     mentors = [user for user in response['users'] if user['role'] == 'mentor']
     admins = [user for user in response['users'] if user['role'] == 'admin']
 
-    # Sort the sessions based on 'date' and 'time' in descending order
-    sessions = sorted(response['sessions'], key=lambda x: (x['date'], x['time']), reverse=True)
+    # Sort mentoring sessions based on 'date' and 'time' in descending order
+    mentoring_sessions = sorted(response['sessions'], key=lambda x: (x['date'], x['time']), reverse=True)
 
-    # Get session IDs from sessions
-    session_ids = [session['id'] for session in sessions]
+    # Get mentoring session IDs from mentoring_sessions
+    mentoring_session_ids = [session['id'] for session in mentoring_sessions]
 
-    # Filter attendances based on session IDs
-    # Safely access 'attendances' with a fallback to an empty list if the key doesn't exist
-    attendances = [attendance for attendance in response.get('attendances', []) if attendance['session_id'] in session_ids]
-
-    # Create attendance_dict to group attendances by session_id
-    attendance_dict = {session_id: [] for session_id in session_ids}
-    for attendance in attendances:
-        attendance_dict[attendance['session_id']].append(attendance)
+    # Filter attendances based on mentoring session IDs
+    attendances = [attendance for attendance in response.get('attendance', []) if attendance['session_id'] in mentoring_session_ids]
 
     # Prepare data for the chart
     daily_sessions_count = defaultdict(int)
     daily_students_count = defaultdict(set)
 
     # Populate daily data based on mentorship sessions
-    for session in sessions:
-        session_date = datetime.strptime(session['date'], "%Y-%m-%d").strftime("%A")
+    for each_session in mentoring_sessions:
+        session_date = datetime.strptime(each_session['date'], "%Y-%m-%d").strftime("%A")
         daily_sessions_count[session_date] += 1
 
     # Populate attendance data
     for attendance in attendances:
-        session = next((s for s in sessions if s['id'] == attendance['session_id']), None)
-        if session:
-            session_date = datetime.strptime(session['date'], "%Y-%m-%d").strftime("%A")
+        each_session = next((s for s in mentoring_sessions if s['id'] == attendance['session_id']), None)
+        if each_session:
+            session_date = datetime.strptime(each_session['date'], "%Y-%m-%d").strftime("%A")
             daily_students_count[session_date].add(attendance['student_id'])
 
     # Convert set of student IDs to counts
     daily_students_count = {day: len(students) for day, students in daily_students_count.items()}
 
-    # Order days of the week for the chart
+    # Ensure all days are included with 0 if missing
     day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     daily_sessions_count = {day: daily_sessions_count.get(day, 0) for day in day_order}
     daily_students_count = {day: daily_students_count.get(day, 0) for day in day_order}
@@ -83,22 +135,30 @@ def admin_dashboard():
         students=students,
         mentors=mentors,
         admins=admins,
-        mentorship_sessions=sessions,
-        attendance_dict=attendance_dict,
+        mentorship_sessions=mentoring_sessions,
+        attendance_dict=attendances,
         total_entries=len(entries),
         total_students=len(students),
         total_mentors=len(mentors),
         daily_sessions_count=daily_sessions_count,
         daily_students_count=daily_students_count,
-        total_sessions=len(sessions),
+        total_sessions=len(mentoring_sessions),
         online_meetings=online_meetings,
         latest_mentor=latest_mentor,
         latest_mentee=latest_mentee,
-        latest_admin=latest_admin
+        latest_admin=latest_admin,
+        user=user
     )
+
 
 @app.route('/entries', methods=['GET', 'POST'])
 def entry_details():
+    
+    if 'user_uid' not in session:
+        flash("Please login first", "info")
+        return redirect('login')
+    
+    user = User.query.filter_by(uid=session['user_uid']).first()
     
     # Handling POST request for filtered entries based on admission year
     if request.method == 'POST':
@@ -114,14 +174,23 @@ def entry_details():
     aiml_entries = [entry for entry in response['entries'] if entry['department'] == 'CSE (AIML)']
     cst_entries = [entry for entry in response['entries'] if entry['department'] == 'CST']
     
-    return render_template('admin/entry_details.html', aiml_entries=aiml_entries, cst_entries=cst_entries)
+    return render_template('admin/entry_details.html', aiml_entries=aiml_entries, cst_entries=cst_entries, user=user)
 
 
-@app.route('/mentees')
+@app.route('/admins')
 def mentee_details():
-    entries = [u for u in response['users'] if u['role'] == 'student']
     
-    return render_template('admin/mentee_details.html', entries=entries)
+    if 'user_uid' not in session:
+        flash("Please login first", "info")
+        return redirect('login')
+    
+    user = User.query.filter_by(uid=session['user_uid']).first()
+    
+    entries = [u for u in response['users'] if u['role'] == 'admin']
+    
+    print(response['department'])
+    
+    return render_template('admin/mentee_details.html', entries=entries, user=user, department=response['department'])
 
 
 @app.route('/mentors')
@@ -193,3 +262,19 @@ def view_details(uid):
 
 #     return render_template('admin/edit_session.html', session=mentorship_session, attendances=attendances)
 
+@app.route('/edit/<string:uid>', methods=['POST'])
+def admin_edit(uid):
+    
+    for user in response['users']:
+        if user['uid'] == uid:
+            user = user
+            break
+    print(user)
+    if request.method == 'POST':
+        role = request.form['role']
+        
+        requests.post('http://127.0.0.1:5001/remote_user_update',
+                      json={'uid': user['uid'], 'role': role})
+        return redirect(url_for('admin_dashboard'))
+    
+    return render_template('admin/edit.html', user=user)
