@@ -6,11 +6,11 @@ from collections import defaultdict
 from models import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils.generate_uid import generate_uid
+import time
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SECRET_KEY'] = 'secret'
-
 
 response = requests.get("http://127.0.0.1:5001/api/aiml").json()
 
@@ -30,6 +30,8 @@ def register():
             new_user = User(uid = generate_uid('superadmin'), username=username, email=email, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
+            
+            return redirect('/dashboard')
         
         else:
             flash("User already exists!!")
@@ -63,7 +65,7 @@ def index():
     if 'user_uid' in session:    
         user = User.query.filter_by(uid = session['user_uid']).first()
         if user:
-            return render_template('index.html')
+            return redirect('/dashboard')
     return redirect('login')
 
 @app.route('/details/aiml')
@@ -75,6 +77,7 @@ def aiml():
 
 @app.route('/dashboard')
 def admin_dashboard():
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
@@ -153,7 +156,7 @@ def admin_dashboard():
 
 @app.route('/entries', methods=['GET', 'POST'])
 def entry_details():
-    
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
@@ -179,7 +182,7 @@ def entry_details():
 
 @app.route('/admins')
 def mentee_details():
-    
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
@@ -195,6 +198,7 @@ def mentee_details():
 
 @app.route('/mentors')
 def mentor_details():
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
     mentors = [u for u in response['users'] if u['role'] == 'mentor']
     
     return render_template('admin/mentor_details.html', mentors=mentors)
@@ -202,6 +206,7 @@ def mentor_details():
 
 @app.route('/sessions')
 def session_log():
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
     # Fetch all sessions, sorted by date and time (descending)
     sessions = sorted(response['sessions'], key=lambda x: (x['date'], x['time']), reverse=True)
     
@@ -221,6 +226,7 @@ def session_log():
 
 @app.route('/view/<string:uid>')
 def view_details(uid):
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
     user_details = next((user for user in response['users'] if user['uid'] == uid), None)
     
     if user_details:
@@ -264,7 +270,7 @@ def view_details(uid):
 
 @app.route('/edit/<string:uid>', methods=['POST'])
 def admin_edit(uid):
-    
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
     for user in response['users']:
         if user['uid'] == uid:
             user = user
@@ -278,3 +284,87 @@ def admin_edit(uid):
         return redirect(url_for('admin_dashboard'))
     
     return render_template('admin/edit.html', user=user)
+
+@app.route('/add_admin', methods=['GET', 'POST'])
+def add_admin():
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    if 'user_uid' not in session:
+        flash("Please login first", "info")
+        return redirect('login')
+    
+    user = User.query.filter_by(uid=session['user_uid']).first()
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        department = request.form['department']
+        
+        if department.lower() == "aiml":
+            requests.post('http://127.0.0.1:5001/register_admin', json={'username': username, 'email': email, 'password': password})
+            
+            flash("Admin added successfully", "success")
+            
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash("Add Department to Proceed", "danger")
+            return redirect(url_for('add_admin'))
+        
+    return render_template('admin/add_admin.html', user=user)
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    if 'user_uid' not in session:
+        flash("Please login first", "info")
+        return redirect('login')
+    
+    user = User.query.filter_by(uid=session['user_uid']).first()
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        
+        user.username = username
+        user.email = email
+        # user.password = generate_password_hash(password)
+        
+        db.session.commit()
+        
+        flash("Profile updated successfully", "success")
+        
+        return redirect(url_for('profile'))
+    
+    return render_template('admin/profile.html', user=user)
+
+@app.route('/update_password', methods=['GET', 'POST'])
+def update_password():
+    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    if 'user_uid' not in session:
+        flash("Please login first", "info")
+        return redirect('login')
+    
+    user = User.query.filter_by(uid=session['user_uid']).first()
+    
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        
+        if check_password_hash(user.password, current_password):
+            user.password = generate_password_hash(new_password)
+            db.session.commit()
+            
+            flash("Password updated successfully", "success")
+            
+            return redirect(url_for('profile'))
+        else:
+            flash("Incorrect password", "danger")
+            return redirect(url_for('profile'))
+    
+    return render_template('admin/update_password.html', user=user)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user_uid', None)
+    return redirect(url_for('login'))

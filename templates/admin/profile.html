@@ -1,0 +1,131 @@
+<!-- Author:
+Akash Nath - AIML(2023-2027) - 2nd year - https://github.com/Akash-nath29 - https://www.linkedin.com/in/akash-nath29/
+Abhinaba Biswas - AIML(2023-2027) - 2nd year - https://github.com/abhinababiswas01 - https://www.linkedin.com/in/abhinaba-biswas/ -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile: {{user.username}}</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='profile.css')}}">
+    <link rel="website icon" type="image/png" href="{{url_for('static', filename='collegeLogo.png')}}">
+    <meta property="og:title" content="Mentorship Records" />
+    <meta property="og:description" content="Record keeping of Mentorship details" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" />
+    <style>
+        form input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #969696;
+            width: 50%;
+        }
+        form input[type='submit'] {
+            background-color: blueviolet;
+            color: white;
+            padding: 10px;
+            margin: 1vh 0;
+            border-radius: 50px;
+            text-decoration: none;
+            outline: none;
+            border: none;
+            transition: 0.4s;
+            cursor: pointer;
+        }
+        form input[type='submit']:hover {
+            background-color: darkblue;
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for message in messages %}
+    <script>
+        alert("{{message}}");
+    </script>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{url_for('static', filename='collegeLogo.png')}}" alt="Logo">
+        </div>
+        <div class="profile">
+            <h2>{{user.role}}</h2>
+            <a href="/logout" class="logout-btn">Log Out</a>
+        </div>
+        <nav>
+            <ul>
+                <li>
+                    <a href="/">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z" />
+                        </svg>&nbsp;
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="/profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+                        </svg>&nbsp;
+                        Profile
+                    </a>
+                </li>
+                <li>
+                    <a href="/dashboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z" />
+                        </svg>&nbsp;
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/add_admin">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 640 512" width="16" height="16">
+                            <path fill="#ffffff"
+                                d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM504 312l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
+                        </svg>&nbsp;
+                        Add Admin
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="content">
+        <header>
+            <h1>Profile</h1>
+            <br>
+            <span style="display: flex; align-items: center; gap: 20px;">
+                <!-- <img id="profileImage" src="{{user.profile_picture}}" alt="" style="border-radius: 50%; width: 200px; aspect-ratio: 1/1; object-fit: cover;"> -->
+                <p>Username: {{user.username}} <br> Email: <a href="mailto:{{user.email}}"
+                        style="color: black;">{{user.email}}</a></p>
+            </span>
+        </header>
+        <form action="/profile" method="post"
+            style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px;" enctype="multipart/form-data">
+            <!-- <label for="profile_picture">Profile Picture</label>
+            <input type="file" name="profile_picture" id="profile_picture" accept="image/*" onchange="previewImage(event)">
+            <br> -->
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" value="{{user.username}}" required>
+            <br>
+            <label for="username">Email</label>
+            <input type="email" name="email" id="username" value="{{user.email}}">
+            <br>    
+            <a href="/update_password">Update Password</a>
+
+            <input type="submit" value="Update Profile">
+        </form>
+    </div>
+</body>
+
+</html>

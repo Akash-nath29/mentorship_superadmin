@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Add Admin</title>
     <link rel="stylesheet" href="{{url_for('static', filename='profile.css')}}">
     <link rel="website icon" type="image/png" href="{{url_for('static', filename='collegeLogo.png')}}">
     <meta property="og:title" content="Mentorship Records" />
@@ -399,8 +399,90 @@
             /* padding: 10px; */
         }
 
-        .card {
+        /* General form styling */
+        .students {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .students h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        /* Form layout */
+        .students form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .students label {
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .students input[type="text"],
+        .students input[type="password"],
+        .students input[type="email"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .students input[type="text"]:focus,
+        .students input[type="password"]:focus,
+        .students input[type="email"]:focus {
+            border-color: #4A90E2;
+            outline: none;
+        }
+
+        /* Button styling */
+        .students button[type="submit"] {
+            padding: 10px;
+            background-color: #4A90E2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .students button[type="submit"]:hover {
+            background-color: #357ABD;
+        }
+
+        .students button[type="submit"]:active {
+            background-color: #2C6A9E;
+        }
+
+        /* Dropdown styling */
+        .students select {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #fafafa;
+            color: #333;
+            appearance: none;
+            /* Removes the default arrow for a cleaner look */
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        /* Focus and hover state */
+        .students select:focus {
+            border-color: #4A90E2;
+            outline: none;
         }
     </style>
 
@@ -413,6 +495,15 @@
 </head>
 
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for message in messages %}
+        <script>
+            alert("{{message}}");
+        </script>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">
@@ -466,193 +557,30 @@
     </div>
 
     <!-- Content -->
+
+    <!-- Create a registration page along with proper css to add admins -->
     <div class="content">
-        <!-- Header -->
-        <header style="padding-left: 15px;">
-            <div>
-                <h1>Welcome, {{user.username}}</h1>
-                <p>Email: <a href="mailto:{{user.email}}" target="_blank" style="color: black;">{{user.email}}</a></p>
-            </div>
-            <div class="card-container">
-                <div class="card tab1">
-                    <h3>Total Entries</h3>
-                    <b>
-                        <p>{{total_entries}}</p>
-                    </b>
-                </div>
-                <div class="card tab2">
-                    <h3>Total Mentees</h3>
-                    <b>
-                        <p>{{total_students}}</p>
-                    </b>
-                </div>
-                <div class="card tab3">
-                    <h3>Total Mentors</h3>
-                    <b>
-                        <p>{{total_mentors}}</p>
-                    </b>
-                </div>
-                <div class="card tab4">
-                    <h3>Total Sessions</h3>
-                    <b>
-                        <p>{{total_sessions}}</p>
-                    </b>
-                </div>
-                </a>
-            </div>
-        </header>
 
-        <!-- Chart -->
-        <div class="chart-container">
-            <canvas id="myChart"></canvas>
-            <div class="recent-updates">
-                <p>Mentee Registered: <br>{{latest_mentee.username}}</p>
-                <p>Mentor Registered: <br>{{latest_mentor.username}}</p>
-                <p>Admin Registered: <br>{{latest_admin.username}}</p>
-            </div>
-        </div>
-
-        <!-- Admin Records -->
         <section class="students">
-            <h2>Admin Records</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for admin in admins %}
-                        <tr>
-                            <td>{{ admin.username }}</td>
-                            <td><a href="mailto:{{ admin.email }}">{{ admin.email }}</a></td>
-                            <td>
-                                <a href="/admins">Edit</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <h2>Add Admin</h2>
+            <form action="/add_admin" method="POST">
+                <select id="department" name="department">
+                    <option value=""> -- Department -- </option>
+                    <option value="aiml">CSE(AIML)</option>
+                    <option value="cst">CST</option>
+                    <option value="cse">CSE</option>
+                    <option value="it">IT</option>
+                </select>
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" required>
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" required>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required>
+                <button type="submit">Add Admin</button>
+            </form>
         </section>
-
-        <!-- Meetings -->
-        <!-- <div class="meetings">
-            <h3>Upcoming/Held Meetings</h3>
-            <ul>
-                <li><span>10:00 AM - Meeting with [Name]</span></li>
-                <li><span>11:30 AM - Project Discussion with [Name]</span></li>
-                <li><span>1:00 PM - Review Session</span></li>
-            </ul>
-        </div> -->
-
-        <!-- Recent Activities -->
-        <h2>Recent Activities</h2>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <!-- <th>Functions</th> -->
-                        <th>UID</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Mentor Email</th>
-                        <th>Meeting Link</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for each_entry in online_meetings %}
-                    <tr>
-                        <td>{{each_entry.uid[:10]}}...</td>
-                        <td>{{each_entry.date}}</td>
-                        <td>{{each_entry.time}}</td>
-                        <td>{{each_entry.mentor_email}}</td>
-                        <td>{{each_entry.link}}</td>
-                        <td>{{each_entry.description}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
     </div>
-    <br><br><br>
-    <!-- Footer -->
-    <footer>
-        Developed by Department of AIML and CST | © JISCE 2024
-    </footer>
-
-    <!-- JavaScript for Chart -->
-    <script>
-        // Get the chart context
-        const ctx = document.getElementById('myChart').getContext('2d');
-
-        // Data for the chart
-        const dailyLabels = {{ daily_sessions_count.keys() | list | tojson }};
-        const sessionsData = {{ daily_sessions_count.values() | list | tojson }};
-        const studentsData = {{ daily_students_count.values() | list | tojson }};
-
-        console.log(dailyLabels);  // Debugging: Check if days are correct
-        console.log(sessionsData); // Debugging: Check if session counts are correct
-        console.log(studentsData); // Debugging: Check if student counts are correct
-
-        // Chart data configuration
-        const chartData = {
-            labels: dailyLabels,
-            datasets: [
-                {
-                    label: 'Sessions Held',
-                    data: sessionsData,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: 'Students Participated',
-                    data: studentsData,
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }
-            ]
-        };
-
-        // Chart configuration
-        const config = {
-            type: 'line',
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return context.dataset.label + ': ' + context.raw;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        };
-
-        // Create the chart
-        new Chart(ctx, config);
-    </script>
 
 </body>
 
