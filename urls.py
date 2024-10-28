@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SECRET_KEY'] = 'secret'
 
-response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+response = requests.get("https://aiml.mentoring.codasauras.in/api/aiml").json()
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -70,34 +70,72 @@ def index():
 
 @app.route('/details/aiml')
 def aiml():
-    details = requests.get('http://127.0.0.1:5001/api/aiml').json()
+    details = requests.get('http://aiml.mentoring.codasauras.in/api/aiml').json()
     # print(details)
     return render_template('aiml.html', entries = details['entries'])
 
 
+from collections import defaultdict
+from datetime import datetime
+import requests
+
 @app.route('/dashboard')
 def admin_dashboard():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    api_endpoints = {
+        'aiml': 'http://aiml.mentoring.codasauras.in/api/aiml',
+        'it': 'http://129.213.151.29:5004/api/it',
+        'bme': 'http://bme.mentoring.codasauras.in/api/bme',
+        'me': 'http://me.mentoring.codasauras.in/api/me',
+        'ee': 'http://127.0.0.1:5006/api/ee',
+        # Add more APIs here in the future as needed
+    }
+
+    # Fetch data from all APIs dynamically
+    responses = {}
+    for dept, url in api_endpoints.items():
+        try:
+            responses[dept] = requests.get(url).json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data from {dept}: {e}")
+            responses[dept] = {}  # If any API fails, use an empty dict
+
+    # Save response to a file for debugging (optional)
+    with open('response.txt', 'w') as f:
+        f.write(str(responses))
+
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
 
     user = User.query.filter_by(uid=session['user_uid']).first()
 
-    # Get the entries and users data from the API response
-    entries = response['entries']
-    students = [user for user in response['users'] if user['role'] == 'student']
-    mentors = [user for user in response['users'] if user['role'] == 'mentor']
-    admins = [user for user in response['users'] if user['role'] == 'admin']
+    # Combine all the data from different API responses
+    combined_data = {
+        'users': [],
+        'sessions': [],
+        'attendance': [],
+        'meetings': [],
+    }
+    
+    for data in responses.values():
+        combined_data['users'].extend(data.get('users', []))
+        combined_data['sessions'].extend(data.get('sessions', []))
+        combined_data['attendance'].extend(data.get('attendance', []))
+        combined_data['meetings'].extend(data.get('meetings', []))
 
-    # Sort mentoring sessions based on 'date' and 'time' in descending order
-    mentoring_sessions = sorted(response['sessions'], key=lambda x: (x['date'], x['time']), reverse=True)
+    # Filter users based on roles
+    students = [user for user in combined_data['users'] if user['role'] == 'student']
+    mentors = [user for user in combined_data['users'] if user['role'] == 'mentor']
+    admins = [user for user in combined_data['users'] if user['role'] == 'admin']
+
+    # Sort mentoring sessions based on 'date' and 'time'
+    mentoring_sessions = sorted(combined_data['sessions'], key=lambda x: (x['date'], x['time']), reverse=True)
 
     # Get mentoring session IDs from mentoring_sessions
     mentoring_session_ids = [session['id'] for session in mentoring_sessions]
 
     # Filter attendances based on mentoring session IDs
-    attendances = [attendance for attendance in response.get('attendance', []) if attendance['session_id'] in mentoring_session_ids]
+    attendances = [attendance for attendance in combined_data.get('attendance', []) if attendance['session_id'] in mentoring_session_ids]
 
     # Prepare data for the chart
     daily_sessions_count = defaultdict(int)
@@ -123,8 +161,8 @@ def admin_dashboard():
     daily_sessions_count = {day: daily_sessions_count.get(day, 0) for day in day_order}
     daily_students_count = {day: daily_students_count.get(day, 0) for day in day_order}
 
-    # Fetch online meetings and sort by 'id' descending
-    online_meetings = sorted(response['meetings'], key=lambda x: x['id'], reverse=True)
+    # Fetch online meetings and sort by 'id'
+    online_meetings = sorted(combined_data['meetings'], key=lambda x: x['id'], reverse=True)
 
     # Find latest mentor, mentee, and admin based on 'id'
     latest_mentor = next((user for user in mentors if user['id'] == max([mentor['id'] for mentor in mentors])), None)
@@ -134,13 +172,13 @@ def admin_dashboard():
     # Render the template with the gathered data
     return render_template(
         'admin/dashboard.html',
-        entries=entries,
+        entries=combined_data,
         students=students,
         mentors=mentors,
         admins=admins,
         mentorship_sessions=mentoring_sessions,
         attendance_dict=attendances,
-        total_entries=len(entries),
+        total_entries=len(combined_data['users']),
         total_students=len(students),
         total_mentors=len(mentors),
         daily_sessions_count=daily_sessions_count,
@@ -153,47 +191,71 @@ def admin_dashboard():
         user=user
     )
 
-
 @app.route('/entries', methods=['GET', 'POST'])
 def entry_details():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    api_endpoints = {
+        'aiml': 'http://aiml.mentoring.codasauras.in/api/aiml',
+        'cst': 'http://127.0.0.1:5002/api/cst',
+        # Add more APIs here in the future if needed
+    }
+
+    # Fetch data from all APIs dynamically
+    responses = {}
+    for dept, url in api_endpoints.items():
+        try:
+            responses[dept] = requests.get(url).json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data from {dept}: {e}")
+            responses[dept] = {}  # Use an empty dict in case of failure
+
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
-    
+
     user = User.query.filter_by(uid=session['user_uid']).first()
-    
-    # Handling POST request for filtered entries based on admission year
+
+    # Handle POST request to filter entries by admission year
     if request.method == 'POST':
         admission_year = request.form['admission_year']
         
-        # Filter AIML and CST entries based on admission year
-        aiml_entries = [entry for entry in response['entries'] if entry['department'] == 'CSE (AIML)' and entry['admission_year'] == admission_year]
-        cst_entries = [entry for entry in response['entries'] if entry['department'] == 'CST' and entry['admission_year'] == admission_year]
+        # Filter entries for AIML and CST departments based on admission year
+        aiml_entries = [entry for entry in responses.get('aiml', {}).get('entries', []) 
+                        if entry['department'] == 'CSE (AIML)' and entry['admission_year'] == admission_year]
+        cst_entries = [entry for entry in responses.get('cst', {}).get('entries', []) 
+                       if entry['department'] == 'CST' and entry['admission_year'] == admission_year]
         
         return render_template('admin/entry_details.html', aiml_entries=aiml_entries, cst_entries=cst_entries)
-    
-    # For GET request: Fetch all AIML and CST entries
-    aiml_entries = [entry for entry in response['entries'] if entry['department'] == 'CSE (AIML)']
-    cst_entries = [entry for entry in response['entries'] if entry['department'] == 'CST']
-    
+
+    # Handle GET request: Fetch all AIML and CST entries
+    aiml_entries = [entry for entry in responses.get('aiml', {}).get('entries', []) if entry['department'] == 'CSE (AIML)']
+    cst_entries = [entry for entry in responses.get('cst', {}).get('entries', []) if entry['department'] == 'CST']
+
     return render_template('admin/entry_details.html', aiml_entries=aiml_entries, cst_entries=cst_entries, user=user)
+
 
 
 @app.route('/admins')
 def mentee_details():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    response_aiml = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
+    response_it = requests.get("http://129.213.151.29:5004/api/it").json()
+    response_bme = requests.get("http://bme.mentoring.codasauras.in/api/bme").json()
+    response_me = requests.get("http://me.mentoring.codasauras.in/api/me").json()
+    response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
     
     user = User.query.filter_by(uid=session['user_uid']).first()
     
-    entries = [u for u in response['users'] if u['role'] == 'admin']
+    entries_aiml = [u for u in response_aiml['users'] if u['role'] == 'admin']
+    entries_it = [u for u in response_it['users'] if u['role'] == 'admin']
+    entries_bme = [u for u in response_bme['users'] if u['role'] == 'admin']
+    entries_me = [u for u in response_me['users'] if u['role'] == 'admin']
+    entries_ee = [u for u in response_ee['users'] if u['role'] == 'admin']
     
     print(response['department'])
     
-    return render_template('admin/mentee_details.html', entries=entries, user=user, department=response['department'])
+    return render_template('admin/mentee_details.html', user=user, aiml=response_aiml['department'], it=response_it['department'], bme=response_bme['department'], me=response_me['department'], entries_aiml=entries_aiml, entries_it=entries_it, entries_bme=entries_bme, entries_me=entries_me, entries_ee=entries_ee)
 
 
 @app.route('/mentors')
@@ -270,24 +332,60 @@ def view_details(uid):
 
 @app.route('/edit/<string:uid>', methods=['POST'])
 def admin_edit(uid):
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
-    for user in response['users']:
-        if user['uid'] == uid:
-            user = user
-            break
-    print(user)
+    # Fetching data from multiple department APIs
+    response_aiml = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
+    response_it = requests.get("http://129.213.151.29:5004/api/it").json()
+    response_bme = requests.get("http://bme.mentoring.codasauras.in/api/bme").json()
+    response_me = requests.get("http://me.mentoring.codasauras.in/api/me").json()
+    response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
+    
+    user = None  # Initialize user as None
+    
+    # Iterate over each department's users and check for matching uid
+    for department in [response_aiml['users'], response_it['users'], response_bme['users'], response_me['users'], response_ee['users']]:
+        for u in department:
+            if u['uid'] == uid:
+                user = u  # Assign the matched user
+                break
+        if user:
+            break  # Break outer loop once user is found
+    
+    # If no user is found, return with an error
+    if not user:
+        flash("User not found", "danger")
+        return redirect(url_for('admin_dashboard'))
+    
     if request.method == 'POST':
-        role = request.form['role']
+        role = request.form.get("role")
+        department = request.form['department']
         
-        requests.post('http://127.0.0.1:5001/remote_user_update',
-                      json={'uid': user['uid'], 'role': role})
+        # Depending on the department, make the appropriate POST request to update the user role
+        if department.lower() == 'aiml':
+            requests.post('https://aiml.mentoring.codasauras.in/remote_user_update/aiml',
+                          json={'uid': user['uid'], 'role': role})
+        elif department.lower() == 'it':
+            requests.post('http://129.213.151.29:5004/remote_user_update/it',
+                          json={'uid': user['uid'], 'role': role})
+        elif department.lower() == 'bme':
+            requests.post('https://bme.mentoring.codasauras.in/remote_user_update/bme',
+                          json={'uid': user['uid'], 'role': role})
+        elif department.lower() == 'me':
+            requests.post('https://me.mentoring.codasauras.in/remote_user_update/me',
+                          json={'uid': user['uid'], 'role': role})
+        elif department.lower() == 'ee':
+            requests.post('https://127.0.0.1:5006/remote_user_update/ee',
+                          json={'uid': user['uid'], 'role': role})
+        else:
+            flash("Invalid department", "danger")
+            return redirect(url_for('edit', uid=uid))
+        
         return redirect(url_for('admin_dashboard'))
     
     return render_template('admin/edit.html', user=user)
 
 @app.route('/add_admin', methods=['GET', 'POST'])
 def add_admin():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    response = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
@@ -301,7 +399,34 @@ def add_admin():
         department = request.form['department']
         
         if department.lower() == "aiml":
-            requests.post('http://127.0.0.1:5001/register_admin', json={'username': username, 'email': email, 'password': password})
+            requests.post('http://aiml.mentoring.codasauras.in/register_admin/aiml', json={'username': username, 'email': email, 'password': password})
+            
+            flash("Admin added successfully", "success")
+            
+            return redirect(url_for('admin_dashboard'))
+        
+        elif department.lower() == "it":
+            requests.post('http://129.213.151.29:5004/register_admin/it', json={'username': username, 'email': email, 'password': password})
+            
+            flash("Admin added successfully", "success")
+            
+            return redirect(url_for('admin_dashboard'))
+        
+        elif department.lower() == "bme":
+            requests.post('http://bme.mentoring.codasauras.in/register_admin/bme', json={'username': username, 'email': email, 'password': password})
+            
+            flash("Admin added successfully", "success")
+            
+            return redirect(url_for('admin_dashboard'))
+        
+        elif department.lower() == "me":
+            requests.post('http://me.mentoring.codasauras.in/register_admin/me', json={'username': username, 'email': email, 'password': password})
+            
+            flash("Admin added successfully", "success")
+            
+            return redirect(url_for('admin_dashboard'))
+        elif department.lower() == "ee":
+            requests.post('http://127.0.0.1:5006/register_admin/ee', json={'username': username, 'email': email, 'password': password})
             
             flash("Admin added successfully", "success")
             
