@@ -7,6 +7,9 @@ from models import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils.generate_uid import generate_uid
 import time
+from collections import defaultdict
+from datetime import datetime
+import requests
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -73,11 +76,6 @@ def aiml():
     details = requests.get('http://aiml.mentoring.codasauras.in/api/aiml').json()
     # print(details)
     return render_template('aiml.html', entries = details['entries'])
-
-
-from collections import defaultdict
-from datetime import datetime
-import requests
 
 @app.route('/dashboard')
 def admin_dashboard():
@@ -236,11 +234,11 @@ def entry_details():
 
 @app.route('/admins')
 def mentee_details():
-    response_aiml = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
+    response_aiml = requests.get("http://127.0.0.1:5001/api/aiml").json()
     response_it = requests.get("http://129.213.151.29:5004/api/it").json()
     response_bme = requests.get("http://bme.mentoring.codasauras.in/api/bme").json()
     response_me = requests.get("http://me.mentoring.codasauras.in/api/me").json()
-    response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
+    # response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
@@ -251,11 +249,11 @@ def mentee_details():
     entries_it = [u for u in response_it['users'] if u['role'] == 'admin']
     entries_bme = [u for u in response_bme['users'] if u['role'] == 'admin']
     entries_me = [u for u in response_me['users'] if u['role'] == 'admin']
-    entries_ee = [u for u in response_ee['users'] if u['role'] == 'admin']
+    # entries_ee = [u for u in response_ee['users'] if u['role'] == 'admin']
     
     print(response['department'])
     
-    return render_template('admin/mentee_details.html', user=user, aiml=response_aiml['department'], it=response_it['department'], bme=response_bme['department'], me=response_me['department'], entries_aiml=entries_aiml, entries_it=entries_it, entries_bme=entries_bme, entries_me=entries_me, entries_ee=entries_ee)
+    return render_template('admin/mentee_details.html', user=user, aiml=response_aiml['department'], it=response_it['department'], bme=response_bme['department'], me=response_me['department'], entries_aiml=entries_aiml, entries_it=entries_it, entries_bme=entries_bme, entries_me=entries_me)#, entries_ee=entries_ee)
 
 
 @app.route('/mentors')
@@ -333,16 +331,16 @@ def view_details(uid):
 @app.route('/edit/<string:uid>', methods=['POST'])
 def admin_edit(uid):
     # Fetching data from multiple department APIs
-    response_aiml = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
+    response_aiml = requests.get("http://127.0.0.1:5001/api/aiml").json()
     response_it = requests.get("http://129.213.151.29:5004/api/it").json()
     response_bme = requests.get("http://bme.mentoring.codasauras.in/api/bme").json()
     response_me = requests.get("http://me.mentoring.codasauras.in/api/me").json()
-    response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
+    # response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
     
     user = None  # Initialize user as None
     
     # Iterate over each department's users and check for matching uid
-    for department in [response_aiml['users'], response_it['users'], response_bme['users'], response_me['users'], response_ee['users']]:
+    for department in [response_aiml['users'], response_it['users'], response_bme['users'], response_me['users']]:#, response_ee['users']]:
         for u in department:
             if u['uid'] == uid:
                 user = u  # Assign the matched user
@@ -361,7 +359,7 @@ def admin_edit(uid):
         
         # Depending on the department, make the appropriate POST request to update the user role
         if department.lower() == 'aiml':
-            requests.post('https://aiml.mentoring.codasauras.in/remote_user_update/aiml',
+            requests.post('http://127.0.0.1:5001/remote_user_update/aiml',
                           json={'uid': user['uid'], 'role': role})
         elif department.lower() == 'it':
             requests.post('http://129.213.151.29:5004/remote_user_update/it',
@@ -399,7 +397,7 @@ def add_admin():
         department = request.form['department']
         
         if department.lower() == "aiml":
-            requests.post('http://aiml.mentoring.codasauras.in/register_admin/aiml', json={'username': username, 'email': email, 'password': password})
+            requests.post('http://127.0.0.1:5001/register_admin/aiml', json={'username': username, 'email': email, 'password': password})
             
             flash("Admin added successfully", "success")
             
