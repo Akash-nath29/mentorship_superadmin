@@ -217,6 +217,8 @@
             text-align: center;
             /* color: var(--text-color); */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-width: 150px;
+
         }
 
         .card:hover {
@@ -469,11 +471,11 @@
     <div class="content">
         <!-- Header -->
         <header style="padding-left: 15px;">
-            <div>
+            <div style="padding: 2vh 0;">
                 <h1>Welcome, {{user.username}}</h1>
                 <p>Email: <a href="mailto:{{user.email}}" target="_blank" style="color: black;">{{user.email}}</a></p>
             </div>
-            <div class="card-container">
+            <!-- <div class="card-container">
                 <div class="card tab1">
                     <h3>Total Entries</h3>
                     <b>
@@ -499,10 +501,38 @@
                     </b>
                 </div>
                 </a>
-            </div>
+            </div> -->
         </header>
 
-        <!-- Chart -->
+        <div class="card-container">
+            <a href="/aiml">
+                <div class="card tab1">
+                    <h3>CSE(AIML) & CST</h3>
+                </div>
+            </a>
+            <a href="/it">
+                <div class="card tab2">
+                    <h3>IT</h3>
+                </div>
+            </a>
+            <a href="/bme">
+                <div class="card tab3">
+                    <h3>BME</h3>
+                </div>
+            </a>
+            <a href="/me">
+                <div class="card tab1">
+                    <h3>ME</h3>
+                </div>
+            </a>
+            <a href="/ee">
+                <div class="card tab2">
+                    <h3>EE</h3>
+                </div>
+            </a>
+        </div>
+
+        <!-- Chart
         <div class="chart-container">
             <canvas id="myChart"></canvas>
             <div class="recent-updates">
@@ -512,7 +542,7 @@
             </div>
         </div>
 
-        <!-- Admin Records -->
+        Admin Records
         <section class="students">
             <h2>Admin Records</h2>
             <div class="table-container">
@@ -539,23 +569,23 @@
             </div>
         </section>
 
-        <!-- Meetings -->
-        <!-- <div class="meetings">
+        Meetings
+        <div class="meetings">
             <h3>Upcoming/Held Meetings</h3>
             <ul>
                 <li><span>10:00 AM - Meeting with [Name]</span></li>
                 <li><span>11:30 AM - Project Discussion with [Name]</span></li>
                 <li><span>1:00 PM - Review Session</span></li>
             </ul>
-        </div> -->
+        </div>
 
-        <!-- Recent Activities -->
+        Recent Activities
         <h2>Recent Activities</h2>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <!-- <th>Functions</th> -->
+                        <th>Functions</th>
                         <th>UID</th>
                         <th>Date</th>
                         <th>Time</th>
@@ -577,7 +607,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
+        </div> -->
     </div>
     <br><br><br>
     <!-- Footer -->

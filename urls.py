@@ -81,10 +81,10 @@ def aiml():
 def admin_dashboard():
     api_endpoints = {
         'aiml': 'http://aiml.mentoring.codasauras.in/api/aiml',
-        'it': 'http://129.213.151.29:5004/api/it',
+        'it': 'http://it.mentoring.codasauras.in/api/it',
         'bme': 'http://bme.mentoring.codasauras.in/api/bme',
         'me': 'http://me.mentoring.codasauras.in/api/me',
-        'ee': 'http://127.0.0.1:5006/api/ee',
+        'ee': 'http://ee.mentoring.codasauras.in/api/ee',
         # Add more APIs here in the future as needed
     }
 
@@ -234,8 +234,8 @@ def entry_details():
 
 @app.route('/admins')
 def mentee_details():
-    response_aiml = requests.get("http://127.0.0.1:5001/api/aiml").json()
-    response_it = requests.get("http://129.213.151.29:5004/api/it").json()
+    response_aiml = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
+    response_it = requests.get("http://it.mentoring.codasauras.in/api/it").json()
     response_bme = requests.get("http://bme.mentoring.codasauras.in/api/bme").json()
     response_me = requests.get("http://me.mentoring.codasauras.in/api/me").json()
     # response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
@@ -258,7 +258,7 @@ def mentee_details():
 
 @app.route('/mentors')
 def mentor_details():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    response = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
     mentors = [u for u in response['users'] if u['role'] == 'mentor']
     
     return render_template('admin/mentor_details.html', mentors=mentors)
@@ -266,7 +266,7 @@ def mentor_details():
 
 @app.route('/sessions')
 def session_log():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    response = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
     # Fetch all sessions, sorted by date and time (descending)
     sessions = sorted(response['sessions'], key=lambda x: (x['date'], x['time']), reverse=True)
     
@@ -286,7 +286,7 @@ def session_log():
 
 @app.route('/view/<string:uid>')
 def view_details(uid):
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    response = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
     user_details = next((user for user in response['users'] if user['uid'] == uid), None)
     
     if user_details:
@@ -331,8 +331,8 @@ def view_details(uid):
 @app.route('/edit/<string:uid>', methods=['POST'])
 def admin_edit(uid):
     # Fetching data from multiple department APIs
-    response_aiml = requests.get("http://127.0.0.1:5001/api/aiml").json()
-    response_it = requests.get("http://129.213.151.29:5004/api/it").json()
+    response_aiml = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
+    response_it = requests.get("http://it.mentoring.codasauras.in/api/it").json()
     response_bme = requests.get("http://bme.mentoring.codasauras.in/api/bme").json()
     response_me = requests.get("http://me.mentoring.codasauras.in/api/me").json()
     # response_ee = requests.get("http://127.0.0.1:5006/api/ee").json()
@@ -359,10 +359,10 @@ def admin_edit(uid):
         
         # Depending on the department, make the appropriate POST request to update the user role
         if department.lower() == 'aiml':
-            requests.post('http://127.0.0.1:5001/remote_user_update/aiml',
+            requests.post('http://aiml.mentoring.codasauras.in/remote_user_update/aiml',
                           json={'uid': user['uid'], 'role': role})
         elif department.lower() == 'it':
-            requests.post('http://129.213.151.29:5004/remote_user_update/it',
+            requests.post('http://it.mentoring.codasauras.in/remote_user_update/it',
                           json={'uid': user['uid'], 'role': role})
         elif department.lower() == 'bme':
             requests.post('https://bme.mentoring.codasauras.in/remote_user_update/bme',
@@ -371,7 +371,7 @@ def admin_edit(uid):
             requests.post('https://me.mentoring.codasauras.in/remote_user_update/me',
                           json={'uid': user['uid'], 'role': role})
         elif department.lower() == 'ee':
-            requests.post('https://127.0.0.1:5006/remote_user_update/ee',
+            requests.post('https://ee.mentoring.codasauras.in/remote_user_update/ee',
                           json={'uid': user['uid'], 'role': role})
         else:
             flash("Invalid department", "danger")
@@ -397,14 +397,14 @@ def add_admin():
         department = request.form['department']
         
         if department.lower() == "aiml":
-            requests.post('http://127.0.0.1:5001/register_admin/aiml', json={'username': username, 'email': email, 'password': password})
+            requests.post('http://aiml.mentoring.codasauras.in/register_admin/aiml', json={'username': username, 'email': email, 'password': password})
             
             flash("Admin added successfully", "success")
             
             return redirect(url_for('admin_dashboard'))
         
         elif department.lower() == "it":
-            requests.post('http://129.213.151.29:5004/register_admin/it', json={'username': username, 'email': email, 'password': password})
+            requests.post('http://it.mentoring.codasauras.in/register_admin/it', json={'username': username, 'email': email, 'password': password})
             
             flash("Admin added successfully", "success")
             
@@ -424,7 +424,7 @@ def add_admin():
             
             return redirect(url_for('admin_dashboard'))
         elif department.lower() == "ee":
-            requests.post('http://127.0.0.1:5006/register_admin/ee', json={'username': username, 'email': email, 'password': password})
+            requests.post('http://ee.mentoring.codasauras.in/register_admin/ee', json={'username': username, 'email': email, 'password': password})
             
             flash("Admin added successfully", "success")
             
@@ -437,7 +437,7 @@ def add_admin():
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    response = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
@@ -462,7 +462,7 @@ def profile():
 
 @app.route('/update_password', methods=['GET', 'POST'])
 def update_password():
-    response = requests.get("http://127.0.0.1:5001/api/aiml").json()
+    response = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
     if 'user_uid' not in session:
         flash("Please login first", "info")
         return redirect('login')
@@ -491,3 +491,179 @@ def update_password():
 def logout():
     session.pop('user_uid', None)
     return redirect(url_for('login'))
+
+@app.route('/aiml')
+def aiml_details():
+    # Fetch the current logged-in user
+    curr_user = User.query.filter_by(uid=session['user_uid']).first()
+
+    # Fetch mentor and session data from the API
+    response = requests.get("http://aiml.mentoring.codasauras.in/api/aiml").json()
+    users = response['users']
+    sessions = response['sessions']
+
+    # Filter out mentors from the users
+    mentors = [user for user in users if user['role'] == 'mentor']
+
+    # Create a dictionary to count sessions for each mentor email
+    mentor_session_count = {mentor['email']: 0 for mentor in mentors}
+
+    # Count the number of sessions for each mentor based on their email
+    for mentorshipsession in sessions:
+        if mentorshipsession['mentor_email'] in mentor_session_count:
+            mentor_session_count[mentorshipsession['mentor_email']] += 1
+
+    # Prepare data for rendering the chart
+    chart_data = {
+        'labels': list(mentor_session_count.keys()),  # Mentor emails
+        'values': list(mentor_session_count.values()) # Session counts
+    }
+    
+    total_faculties = len(mentors)
+    # total_goals = len(response['goals'])
+    total_sessions = len(sessions)
+    
+    total_goal = 400 #TODO: Fetch from API
+
+    return render_template('aiml.html', mentors=mentors, user=curr_user, chart_data=chart_data, total_faculties=total_faculties, total_sessions=total_sessions, total_goal=total_goal)
+
+@app.route('/it')
+def it_details():
+    # Fetch the current logged-in user
+    curr_user = User.query.filter_by(uid=session['user_uid']).first()
+
+    # Fetch mentor and session data from the API
+    response = requests.get("http://it.mentoring.codasauras.in/api/it").json()
+    users = response['users']
+    sessions = response['sessions']
+
+    # Filter out mentors from the users
+    mentors = [user for user in users if user['role'] == 'mentor']
+
+    # Create a dictionary to count sessions for each mentor email
+    mentor_session_count = {mentor['email']: 0 for mentor in mentors}
+
+    # Count the number of sessions for each mentor based on their email
+    for mentorshipsession in sessions:
+        if mentorshipsession['mentor_email'] in mentor_session_count:
+            mentor_session_count[mentorshipsession['mentor_email']] += 1
+
+    # Prepare data for rendering the chart
+    chart_data = {
+        'labels': list(mentor_session_count.keys()),  # Mentor emails
+        'values': list(mentor_session_count.values()) # Session counts
+    }
+    
+    total_faculties = len(mentors)
+    # total_goals = len(response['goals'])
+    total_sessions = len(sessions)
+    
+    total_goal = 400 #TODO: Fetch from API
+
+    return render_template('it.html', mentors=mentors, user=curr_user, chart_data=chart_data, total_faculties=total_faculties, total_sessions=total_sessions, total_goal=total_goal)
+
+@app.route('/bme')
+def bme_details():
+    # Fetch the current logged-in user
+    curr_user = User.query.filter_by(uid=session['user_uid']).first()
+
+    # Fetch mentor and session data from the API
+    response = requests.get("http://bme.mentoring.codasauras.in/api/bme").json()
+    users = response['users']
+    sessions = response['sessions']
+
+    # Filter out mentors from the users
+    mentors = [user for user in users if user['role'] == 'mentor']
+
+    # Create a dictionary to count sessions for each mentor email
+    mentor_session_count = {mentor['email']: 0 for mentor in mentors}
+
+    # Count the number of sessions for each mentor based on their email
+    for mentorshipsession in sessions:
+        if mentorshipsession['mentor_email'] in mentor_session_count:
+            mentor_session_count[mentorshipsession['mentor_email']] += 1
+
+    # Prepare data for rendering the chart
+    chart_data = {
+        'labels': list(mentor_session_count.keys()),  # Mentor emails
+        'values': list(mentor_session_count.values()) # Session counts
+    }
+    
+    total_faculties = len(mentors)
+    # total_goals = len(response['goals'])
+    total_sessions = len(sessions)
+    
+    total_goal = 400 #TODO: Fetch from API
+
+    return render_template('bme.html', mentors=mentors, user=curr_user, chart_data=chart_data, total_faculties=total_faculties, total_sessions=total_sessions, total_goal=total_goal)
+
+@app.route('/me')
+def me_details():
+    # Fetch the current logged-in user
+    curr_user = User.query.filter_by(uid=session['user_uid']).first()
+
+    # Fetch mentor and session data from the API
+    response = requests.get("http://me.mentoring.codasauras.in/api/me").json()
+    users = response['users']
+    sessions = response['sessions']
+
+    # Filter out mentors from the users
+    mentors = [user for user in users if user['role'] == 'mentor']
+
+    # Create a dictionary to count sessions for each mentor email
+    mentor_session_count = {mentor['email']: 0 for mentor in mentors}
+
+    # Count the number of sessions for each mentor based on their email
+    for mentorshipsession in sessions:
+        if mentorshipsession['mentor_email'] in mentor_session_count:
+            mentor_session_count[mentorshipsession['mentor_email']] += 1
+
+    # Prepare data for rendering the chart
+    chart_data = {
+        'labels': list(mentor_session_count.keys()),  # Mentor emails
+        'values': list(mentor_session_count.values()) # Session counts
+    }
+    
+    total_faculties = len(mentors)
+    # total_goals = len(response['goals'])
+    total_sessions = len(sessions)
+    
+    total_goal = 400 #TODO: Fetch from API
+
+    return render_template('me.html', mentors=mentors, user=curr_user, chart_data=chart_data, total_faculties=total_faculties, total_sessions=total_sessions, total_goal=total_goal)
+
+
+@app.route('/ee')
+def ee_details():
+    # Fetch the current logged-in user
+    curr_user = User.query.filter_by(uid=session['user_uid']).first()
+
+    # Fetch mentor and session data from the API
+    response = requests.get("http://ee.mentoring.codasauras.in/api/ee").json()
+    users = response['users']
+    sessions = response['sessions']
+
+    # Filter out mentors from the users
+    mentors = [user for user in users if user['role'] == 'mentor']
+
+    # Create a dictionary to count sessions for each mentor email
+    mentor_session_count = {mentor['email']: 0 for mentor in mentors}
+
+    # Count the number of sessions for each mentor based on their email
+    for mentorshipsession in sessions:
+        if mentorshipsession['mentor_email'] in mentor_session_count:
+            mentor_session_count[mentorshipsession['mentor_email']] += 1
+
+    # Prepare data for rendering the chart
+    chart_data = {
+        'labels': list(mentor_session_count.keys()),  # Mentor emails
+        'values': list(mentor_session_count.values()) # Session counts
+    }
+    
+    total_faculties = len(mentors)
+    # total_goals = len(response['goals'])
+    total_sessions = len(sessions)
+    
+    total_goal = 400 #TODO: Fetch from API
+
+    return render_template('ee.html', mentors=mentors, user=curr_user, chart_data=chart_data, total_faculties=total_faculties, total_sessions=total_sessions, total_goal=total_goal)
