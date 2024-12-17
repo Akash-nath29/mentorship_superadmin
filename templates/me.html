@@ -56,7 +56,7 @@ Abhinaba Biswas - AIML(2023-2027) - 2nd year - https://github.com/abhinababiswas
             background-color: #f9f9f9;
             padding: 1vh 2vh;
             border-radius: 5px;
-            margin: 2vh 0;
+            /* margin: 2vh 0; */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -65,9 +65,15 @@ Abhinaba Biswas - AIML(2023-2027) - 2nd year - https://github.com/abhinababiswas
 
         .card span {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
             width: 100%;
+        }
+
+        #goalComparisonChart {
+            width: 30vw;
+            height: auto;
         }
     </style>
 </head>
@@ -160,15 +166,16 @@ Abhinaba Biswas - AIML(2023-2027) - 2nd year - https://github.com/abhinababiswas
                     <h3>Total Achieved: {{total_sessions}}</h3>
                     <!-- <p></p> -->
                 </span>
-                <!-- <div class="comparison">
-                    <canvas></canvas>
-                </div> -->
+                <div class="comparison">
+                    <!-- <canvas></canvas> -->
+                    <canvas id="goalComparisonChart" width="400" height="200"></canvas>
+                </div>
             </div>
             
             <!-- Add a canvas for the comparison graph -->
-            <div style="margin-top: 20px;">
-                <canvas id="goalComparisonChart" width="400" height="200"></canvas>
-            </div>
+            <!-- <div style="margin-top: 20px;">
+                
+            </div> -->
 
             
         </center>
@@ -201,6 +208,44 @@ Abhinaba Biswas - AIML(2023-2027) - 2nd year - https://github.com/abhinababiswas
                 }
             });
         </script>
+        <script>
+            // Data for the Goal Comparison Chart
+            const goalComparisonCtx = document.getElementById('goalComparisonChart').getContext('2d');
+            const totalGoal = {{ total_goal }};
+            const totalAchieved = {{ total_sessions }};
+        
+            new Chart(goalComparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Target Goal', 'Achieved Goal'],
+                    datasets: [{
+                        label: 'Monthly Target vs Achieved',
+                        data: [totalGoal, totalAchieved],
+                        backgroundColor: ['#36a2eb', '#4caf50'],
+                        borderColor: ['#2196f3', '#388e3c'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 10
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        </script>
+        
     </div>
 </body>
 
